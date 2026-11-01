@@ -2,13 +2,20 @@ import { useState, useEffect, useRef } from "react";
 import { fetchProperties } from "../api/client";
 import PropertyCard from "../components/PropertyCard";
 import PropertyFilters from "../components/PropertyFilters";
+import Pagination from "../components/Pagination";
 
 function ListingsPage() {
     const [properties, setProperties] = useState([]);
     const [total, setTotal] = useState(0);
     const[loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(20);
+    const [activeFilters, setActiveFilters] = useState({});
     const[error, setError] = useState(null);
     const latestRequest = useRef(0);
+    const offset = (currentPage - 1) * itemsPerPage;
+    const totalPages = Math.ceil(total / itemsPerPage);
+    
 
     useEffect(() => {
         latestRequest.current += 1;
@@ -19,7 +26,11 @@ function ListingsPage() {
                 setLoading(true);
                 setError(null);
 
-                const data = await fetchProperties({ limit: 20});
+                const data = await fetchProperties({ 
+                    ...activeFilters,
+                    limit: itemsPerPage, 
+                    offset: offset
+                });
 
                 if (requestId === latestRequest.current) {
                     setProperties(data.results);
@@ -43,34 +54,21 @@ function ListingsPage() {
                 latestRequest.current += 1;
             }
         };
-    }, []);
+    }, [currentPage, itemsPerPage, activeFilters]);
     
-    async function handleSearch(filters) {
-        const cleanFilters = Object.fromEntries(
+    function handleSearch(filters) {
+    const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([key, value]) => value !== "")
-        );
+    );
 
-        latestRequest.current += 1;
-        const requestId = latestRequest.current;
 
-        setLoading(true);
-        setError(null);
+    setCurrentPage(1);
+    setActiveFilters(cleanFilters);
+}
 
-        try {
-            const data = await fetchProperties(cleanFilters);
-            if (requestId === latestRequest.current) {
-                setProperties(data.results);
-                setTotal(data.total);
-            }
-        } catch (error) {
-            if (requestId === latestRequest.current) {
-                setError(error.message);
-            }
-        } finally {
-            if (requestId === latestRequest.current) {
-                setLoading(false);
-            }
-        }
+    function handlePageChange(page) {
+        setCurrentPage(page);
+        window.scrollTo(0, 0);
     }
     
     return (
@@ -83,7 +81,9 @@ function ListingsPage() {
             {!loading && !error && (
                 <>
                     <p>Browse available properties</p>
-                    <p>Showing {properties.length} of {total.toLocaleString()} properties</p>
+                    <p>Showing {total === 0 ? 0 : offset + 1} - 
+                        {Math.min(offset + properties.length, total)} of {total.toLocaleString} properties
+                    </p>
                     {properties.length === 0 ? (
                         <p>No properties found. Try adjusting your filters.</p>
                     ) : (
@@ -93,6 +93,11 @@ function ListingsPage() {
                             ))}
                         </div>
                     )}
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={handlePageChange}
+                    />
                 </>
             )}
         </div>
