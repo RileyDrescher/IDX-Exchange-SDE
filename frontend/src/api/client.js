@@ -21,3 +21,18 @@ export async function fetchPropertyDetail(id) {
 
     return response.json();
 }
+
+
+export async function fetchPropertyOpenHouses(id) {
+    const response = await fetch(
+        `/api/properties/${encodeURIComponent(id)}/openhouses`
+    );
+
+    if (!response.ok) {
+        throw new Error(
+            `Failed to fetch open houses: HTTP ${response.status}`
+        );
+    }
+
+    return response.json();
+}
