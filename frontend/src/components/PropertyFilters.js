@@ -21,7 +21,6 @@ function PropertyFilters( {onSearch}) {
 
     function handleSubmit(event) {
         event.preventDefault();
-        console.log("Search submitted:", filters);
         onSearch(filters);
     }
 
@@ -38,12 +37,13 @@ function PropertyFilters( {onSearch}) {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className="filters" onSubmit={handleSubmit} aria-label="Filter properties">
             <h2>Filter Properties</h2>
             <input
                 type="text"
                 name="city"
                 placeholder="City"
+                aria-label="City"
                 value={filters.city}
                 onChange={handleChange}
             />
@@ -52,6 +52,8 @@ function PropertyFilters( {onSearch}) {
                 type="text"
                 name="zipcode"
                 placeholder="ZIP Code"
+                aria-label="ZIP code"
+                inputMode="numeric"
                 value={filters.zipcode}
                 onChange={handleChange} 
             />
@@ -60,6 +62,8 @@ function PropertyFilters( {onSearch}) {
                 type="number"
                 name="minPrice"
                 placeholder="Min Price"
+                aria-label="Minimum price"
+                min="0"
                 value={filters.minPrice}
                 onChange={handleChange}
             />
@@ -68,11 +72,13 @@ function PropertyFilters( {onSearch}) {
                 type="number"
                 name="maxPrice"
                 placeholder="Max Price"
+                aria-label="Maximum price"
+                min="0"
                 value={filters.maxPrice}
                 onChange={handleChange}
             />
 
-            <select name="beds" value={filters.beds} onChange={handleChange}>
+            <select name="beds" aria-label="Bedrooms" value={filters.beds} onChange={handleChange}>
                 <option value="">Any Bedrooms</option>
                 <option value="1">1+</option>
                 <option value="2">2+</option>
@@ -81,7 +87,7 @@ function PropertyFilters( {onSearch}) {
                 <option value="5">5+</option>
             </select>
 
-            <select name="baths" value={filters.baths} onChange={handleChange}>
+            <select name="baths" aria-label="Bathrooms" value={filters.baths} onChange={handleChange}>
                 <option value="">Any Bathrooms</option>
                 <option value="1">1+</option>
                 <option value="2">2+</option>

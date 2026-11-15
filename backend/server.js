@@ -11,20 +11,25 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
-app.use((req, res, next) => {
-    const startTime = Date.now();
+// Request logger: method, URL, time, status and response time in ms.
+// process.hrtime.bigint() is a monotonic high-resolution clock, so the
+// duration is accurate to fractions of a millisecond.
+function requestLogger(req, res, next) {
+    const start = process.hrtime.bigint();
     const timestamp = new Date().toISOString();
 
     res.on("finish", () => {
-        const duration = Date.now() - startTime;
+        const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
 
         console.log(
-            `${req.method} ${req.originalUrl} | ${timestamp} | Status: ${res.statusCode} | ${duration}ms`
+            `${req.method} ${req.originalUrl} | ${timestamp} | Status: ${res.statusCode} | ${durationMs.toFixed(2)}ms`
         );
     });
 
     next();
-});
+}
+
+app.use(requestLogger);
 
 app.use("/api/properties", propertiesRouter);
 
@@ -46,6 +51,13 @@ app.get("/api/health", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+// Only start listening when run directly (npm run dev / node server.js),
+// so tests can import the app without opening a port.
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
+}
+
+module.exports = app;
+module.exports.requestLogger = requestLogger;

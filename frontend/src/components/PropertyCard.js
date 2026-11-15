@@ -1,28 +1,48 @@
 import { Link } from "react-router-dom";
 import PropertyImageCarousel from "./PropertyImageCarousel";
+import FavoriteButton from "./FavoriteButton";
+
+function formatPrice(value) {
+    const price = Number(value);
+    return value !== null && value !== undefined && Number.isFinite(price)
+        ? `$${price.toLocaleString()}`
+        : "Price on request";
+}
+
+function formatNumber(value) {
+    const number = Number(value);
+    return value !== null && value !== undefined && Number.isFinite(number)
+        ? number.toLocaleString()
+        : "—";
+}
 
 function PropertyCard({ property }) {
     return (
-        <div className="property-card">
-            <PropertyImageCarousel
-                photosData={property.L_Photos}
-                alt={property.L_Address}
-            />
+        <article className="property-card">
+            <div className="property-card-media">
+                <PropertyImageCarousel
+                    photosData={property.L_Photos}
+                    alt={property.L_Address}
+                />
+                <FavoriteButton property={property} className="favorite-button--overlay" />
+            </div>
 
             <Link
                 to={`/property/${property.id}`}
                 className="property-card-details"
             >
-                <h3>{property.L_Address}</h3>
-                <p>${Number(property.L_SystemPrice).toLocaleString()}</p>
-                <p>{property.L_City}, {property.L_State}</p>
-                <p>
-                    {property.L_Keyword2} Beds |{" "}
-                    {Number(property.LM_Dec_3)} Baths |{" "}
-                    {Number(property.LM_Int2_3).toLocaleString()} Sqft
+                <p className="property-card-price">{formatPrice(property.L_SystemPrice)}</p>
+                <h3 className="property-card-address">{property.L_Address || "Address not listed"}</h3>
+                <p className="property-card-location">
+                    {[property.L_City, property.L_State].filter(Boolean).join(", ")}
                 </p>
+                <ul className="property-card-stats">
+                    <li><strong>{formatNumber(property.L_Keyword2)}</strong> Beds</li>
+                    <li><strong>{formatNumber(property.LM_Dec_3)}</strong> Baths</li>
+                    <li><strong>{formatNumber(property.LM_Int2_3)}</strong> Sqft</li>
+                </ul>
             </Link>
-        </div>
+        </article>
     );
 }
 

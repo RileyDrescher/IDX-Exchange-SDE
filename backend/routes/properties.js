@@ -2,6 +2,46 @@ const pool = require("../db");
 const express = require("express");
 const router = express.Router();
 
+// Whitelist of real rets_property columns that may be used in ORDER BY.
+// SQL identifiers can't be bound with "?", so only values from this list
+// are ever interpolated into the query string.
+const SORTABLE_COLUMNS = Object.freeze({
+    L_SystemPrice: "L_SystemPrice",            // price
+    ListingContractDate: "ListingContractDate", // date listed
+    LM_Int2_3: "LM_Int2_3",                    // square footage
+    L_Keyword2: "L_Keyword2"                   // bedrooms
+});
+
+const SORT_ORDERS = Object.freeze({ asc: "ASC", desc: "DESC" });
+
+// Returns { orderBy } on success or { error } for an invalid request.
+// `alias` qualifies column names (e.g. "p.") when the query joins tables.
+function buildOrderBy(sortBy, sortOrder, alias = "") {
+    if (sortOrder !== undefined) {
+        if (typeof sortOrder !== "string" ||
+            !Object.hasOwn(SORT_ORDERS, sortOrder.toLowerCase())) {
+            return { error: "sortOrder must be 'asc' or 'desc'" };
+        }
+    }
+
+    if (sortBy === undefined) {
+        return { orderBy: "ORDER BY id" };
+    }
+
+    if (typeof sortBy !== "string" || !Object.hasOwn(SORTABLE_COLUMNS, sortBy)) {
+        return {
+            error: `sortBy must be one of: ${Object.keys(SORTABLE_COLUMNS).join(", ")}`
+        };
+    }
+
+    const column = alias + SORTABLE_COLUMNS[sortBy];
+    const direction = SORT_ORDERS[(sortOrder || "asc").toLowerCase()];
+
+    // "column IS NULL" first keeps listings with missing data at the end in
+    // both directions; "id" breaks ties so pages never overlap or skip rows.
+    return { orderBy: `ORDER BY ${column} IS NULL, ${column} ${direction}, ${alias}id ${direction}` };
+}
+
 router.get("/", async (req, res) => {
     try {
         const limit = req.query.limit === undefined ? 20 : Number(req.query.limit);
@@ -86,15 +126,47 @@ router.get("/", async (req, res) => {
             });
         }
 
+        const { orderBy, error: sortError } = buildOrderBy(
+            req.query.sortBy,
+            req.query.sortOrder
+        );
+
+        if (sortError) {
+            return res.status(400).json({ error: sortError });
+        }
+
         const [countRows] = await pool.query(
             `SELECT COUNT(*) AS total FROM rets_property ${whereClause}`,
             values
         );
 
-        const [rows] = await pool.query(
-        `SELECT * FROM rets_property ${whereClause} ORDER BY id LIMIT ? OFFSET ?`,
-        [...values, limit, offset]
-        );
+        let rows;
+
+        if (req.query.sortBy === undefined) {
+            // Default order uses the primary key, so this is already fast.
+            [rows] = await pool.query(
+                `SELECT * FROM rets_property ${whereClause} ${orderBy} LIMIT ? OFFSET ?`,
+                [...values, limit, offset]
+            );
+        } else {
+            // Deferred join: sorting full rows (big text/photo columns) across
+            // the whole table is slow, so sort only ids in the subquery, then
+            // fetch full rows for just this page and re-apply the same order.
+            const { orderBy: outerOrderBy } = buildOrderBy(
+                req.query.sortBy,
+                req.query.sortOrder,
+                "p."
+            );
+
+            [rows] = await pool.query(
+                `SELECT p.* FROM rets_property p
+                 JOIN (
+                     SELECT id FROM rets_property ${whereClause} ${orderBy} LIMIT ? OFFSET ?
+                 ) page ON page.id = p.id
+                 ${outerOrderBy}`,
+                [...values, limit, offset]
+            );
+        }
 
         res.json({
             total: countRows[0].total,
@@ -187,3 +259,5 @@ router.get("/:id", async (req, res) => {
     }
 });
 module.exports = router;
+module.exports.buildOrderBy = buildOrderBy;
+module.exports.SORTABLE_COLUMNS = SORTABLE_COLUMNS;

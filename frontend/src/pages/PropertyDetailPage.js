@@ -7,6 +7,7 @@ import {
 } from "../api/client";
 import PropertyImageGallery from "../components/PropertyImageGallery";
 import PropertyMap from "../components/PropertyMap";
+import FavoriteButton from "../components/FavoriteButton";
 
 function PropertyDetailPage() {
     const { id } = useParams();
@@ -89,15 +90,15 @@ function PropertyDetailPage() {
 
     // Loading state
     if (loading) {
-        return <p>Loading property details...</p>;
+        return <p className="status-message">Loading property details...</p>;
     }
 
     // Error state
     if (error) {
         return (
-            <div>
-                <Link to="/">← Back to Listings</Link>
-                <p>Failed to load property: {error}</p>
+            <div className="property-detail">
+                <Link to="/" className="back-link">← Back to Listings</Link>
+                <p className="status-message status-message--error">Failed to load property: {error}</p>
             </div>
         );
     }
@@ -108,17 +109,22 @@ function PropertyDetailPage() {
     }
 
     return (
-        <div>
-            <Link to="/">← Back to Listings</Link>
+        <div className="property-detail">
+            <Link to="/" className="back-link">← Back to Listings</Link>
 
-            <h1>{property.L_Address}</h1>
-            <h2>${Number(property.L_SystemPrice).toLocaleString()}</h2>
+            <div className="detail-header">
+                <div>
+                    <h1>{property.L_Address}</h1>
+                    <p className="detail-price">${Number(property.L_SystemPrice).toLocaleString()}</p>
+                </div>
+                <FavoriteButton property={property} />
+            </div>
 
-            <p>
+            <p className="detail-location">
                 {property.L_City}, {property.L_State} {property.L_Zip}
             </p>
 
-            <p>
+            <p className="detail-stats">
                 {property.L_Keyword2} Beds |{" "}
                 {Number(property.LM_Dec_3)} Baths |{" "}
                 {Number(property.LM_Int2_3).toLocaleString()} Sqft
@@ -135,6 +141,7 @@ function PropertyDetailPage() {
 
             <h2>Property Details</h2>
 
+            <div className="detail-facts">
             <p>Year Built: {property.YearBuilt ?? "N/A"}</p>
             <p>Property Type: {property.L_Type_ || "N/A"}</p>
             <p>
@@ -148,6 +155,7 @@ function PropertyDetailPage() {
             <p>Cooling: {property.Cooling || "N/A"}</p>
             <p>Architectural Style: {property.ArchitecturalStyle || "N/A"}</p>
             <p>Open Parking Spaces: {property.OpenParkingSpaces ?? "N/A"}</p>
+            </div>
 
             {/* Google Map */}
             <PropertyMap
