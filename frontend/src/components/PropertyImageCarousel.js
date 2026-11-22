@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { parsePhotos } from "../utils/photos";
+import PropTypes from "prop-types";
+import { photosDataType } from "../utils/propTypes";
 
 function PropertyImageCarousel({ photosData, alt }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -66,5 +68,10 @@ function handleNext(event) {
     </div>
 );
 }
+
+PropertyImageCarousel.propTypes = {
+    photosData: photosDataType,
+    alt: PropTypes.string
+};
 
 export default PropertyImageCarousel;

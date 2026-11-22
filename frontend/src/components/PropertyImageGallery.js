@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { parsePhotos } from "../utils/photos";
+import PropTypes from "prop-types";
+import { photosDataType } from "../utils/propTypes";
 
 function PropertyImageGallery({ photosData, alt }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -130,5 +132,10 @@ function PropertyImageGallery({ photosData, alt }) {
         </div>
     );
 }
+
+PropertyImageGallery.propTypes = {
+    photosData: photosDataType,
+    alt: PropTypes.string
+};
 
 export default PropertyImageGallery;

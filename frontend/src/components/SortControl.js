@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 // Values are "<column>:<order>", using the backend's whitelisted
 // rets_property column names so they can be sent straight to the API.
 export const SORT_OPTIONS = [
@@ -33,5 +35,11 @@ function SortControl({ sortBy, sortOrder, onSortChange }) {
         </div>
     );
 }
+
+SortControl.propTypes = {
+    sortBy: PropTypes.string.isRequired,
+    sortOrder: PropTypes.string.isRequired,
+    onSortChange: PropTypes.func.isRequired
+};
 
 export default SortControl;

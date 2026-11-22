@@ -1,3 +1,4 @@
+import { numberOrString } from "../utils/propTypes";
 
 function PropertyMap({ latitude, longitude }) {
     if (!latitude || !longitude) {
@@ -41,5 +42,10 @@ function PropertyMap({ latitude, longitude }) {
         </div>
     );
 }
+
+PropertyMap.propTypes = {
+    latitude: numberOrString,
+    longitude: numberOrString
+};
 
 export default PropertyMap;
