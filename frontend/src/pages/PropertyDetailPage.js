@@ -8,6 +8,12 @@ import {
 import PropertyImageGallery from "../components/PropertyImageGallery";
 import PropertyMap from "../components/PropertyMap";
 import FavoriteButton from "../components/FavoriteButton";
+import { formatPrice, formatNumber } from "../utils/format";
+import {
+    formatOpenHouseDate,
+    formatOpenHouseTime,
+    getOpenHouseRemarks
+} from "../utils/openHouse";
 
 function PropertyDetailPage() {
     const { id } = useParams();
@@ -115,7 +121,7 @@ function PropertyDetailPage() {
             <div className="detail-header">
                 <div>
                     <h1>{property.L_Address}</h1>
-                    <p className="detail-price">${Number(property.L_SystemPrice).toLocaleString()}</p>
+                    <p className="detail-price">{formatPrice(property.L_SystemPrice)}</p>
                 </div>
                 <FavoriteButton property={property} />
             </div>
@@ -126,8 +132,8 @@ function PropertyDetailPage() {
 
             <p className="detail-stats">
                 {property.L_Keyword2} Beds |{" "}
-                {Number(property.LM_Dec_3)} Baths |{" "}
-                {Number(property.LM_Int2_3).toLocaleString()} Sqft
+                {formatNumber(property.LM_Dec_3)} Baths |{" "}
+                {formatNumber(property.LM_Int2_3)} Sqft
             </p>
 
             {/* Property Image Gallery */}
@@ -206,52 +212,3 @@ function PropertyDetailPage() {
 }
 
 export default PropertyDetailPage;
-
-
-function formatOpenHouseDate(dateString) {
-    if (!dateString) {
-        return "N/A";
-    }
-
-    // Use the date portion to avoid timezone shifting.
-    const date = dateString.slice(0, 10);
-    const [year, month, day] = date.split("-").map(Number);
-
-    return new Date(year, month - 1, day).toLocaleDateString("en-US", {
-        month: "long",
-        day: "numeric",
-        year: "numeric"
-    });
-}
-
-function formatOpenHouseTime(timeString) {
-    if (!timeString) {
-        return "N/A";
-    }
-
-    const [hours, minutes] = timeString.split(":").map(Number);
-
-    const period = hours >= 12 ? "PM" : "AM";
-    const formattedHour = hours % 12 || 12;
-
-    return `${formattedHour}:${String(minutes).padStart(2, "0")} ${period}`;
-}
-
-function getOpenHouseRemarks(allData) {
-    try {
-        if (!allData) {
-            return null;
-        }
-
-        const data = typeof allData === "string"
-            ? JSON.parse(allData)
-            : allData;
-
-        return typeof data?.OpenHouseRemarks === "string"
-            ? data.OpenHouseRemarks.trim() || null
-            : null;
-    } catch (error) {
-        return null;
-    }
-}
-

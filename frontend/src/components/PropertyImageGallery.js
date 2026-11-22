@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from "react";
+import { parsePhotos } from "../utils/photos";
 
 function PropertyImageGallery({ photosData, alt }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -131,25 +132,3 @@ function PropertyImageGallery({ photosData, alt }) {
 }
 
 export default PropertyImageGallery;
-
-function parsePhotos(photosData) {
-    try {
-        if (!photosData) {
-            return [];
-        }
-
-        const photos = typeof photosData === "string"
-            ? JSON.parse(photosData)
-            : photosData;
-
-        if (!Array.isArray(photos)) {
-            return [];
-        }
-
-        return photos.filter(
-            photo => typeof photo === "string" && photo.trim()
-        );
-    } catch (error) {
-        return [];
-    }
-}
