@@ -5,22 +5,22 @@ const pool = require("../db");
 const app = require("../server");
 
 test("logs method, url, status and response time in ms", async () => {
-    const log = jest.spyOn(console, "log").mockImplementation(() => {});
+    const log = jest.spyOn(process.stdout, "write").mockImplementation(() => true);
     pool.query.mockResolvedValueOnce([[{ 1: 1 }]]);
 
     await request(app).get("/api/health");
 
     const line = log.mock.calls.map((c) => c[0]).find((l) => l.includes("/api/health"));
-    expect(line).toMatch(/^GET \/api\/health \| .+ \| Status: 200 \| \d+\.\d{2}ms$/);
+    expect(line).toMatch(/^GET \/api\/health \| .+ \| Status: 200 \| \d+\.\d{2}ms\n$/);
     log.mockRestore();
 });
 
 test("logs failed requests with their status too", async () => {
-    const log = jest.spyOn(console, "log").mockImplementation(() => {});
+    const log = jest.spyOn(process.stdout, "write").mockImplementation(() => true);
 
     await request(app).get("/api/properties?sortBy=bad");
 
     const line = log.mock.calls.map((c) => c[0]).find((l) => l.includes("sortBy=bad"));
-    expect(line).toMatch(/Status: 400 \| \d+\.\d{2}ms$/);
+    expect(line).toMatch(/Status: 400 \| \d+\.\d{2}ms\n$/);
     log.mockRestore();
 });

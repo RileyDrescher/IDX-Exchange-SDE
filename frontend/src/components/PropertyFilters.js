@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 function PropertyFilters( {onSearch}) {
     const [filters, setfilters] = useState({
@@ -101,5 +102,9 @@ function PropertyFilters( {onSearch}) {
         </form>
     );
 }
+
+PropertyFilters.propTypes = {
+    onSearch: PropTypes.func.isRequired
+};
 
 export default PropertyFilters;

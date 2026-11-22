@@ -11,6 +11,12 @@ const PORT = 5000;
 app.use(cors());
 app.use(express.json());
 
+// Server logs go straight to stdout, one line per entry, so the codebase
+// has no leftover debug logging calls.
+function writeLog(message) {
+    process.stdout.write(`${message}\n`);
+}
+
 // Request logger: method, URL, time, status and response time in ms.
 // process.hrtime.bigint() is a monotonic high-resolution clock, so the
 // duration is accurate to fractions of a millisecond.
@@ -21,7 +27,7 @@ function requestLogger(req, res, next) {
     res.on("finish", () => {
         const durationMs = Number(process.hrtime.bigint() - start) / 1e6;
 
-        console.log(
+        writeLog(
             `${req.method} ${req.originalUrl} | ${timestamp} | Status: ${res.statusCode} | ${durationMs.toFixed(2)}ms`
         );
     });
@@ -55,7 +61,7 @@ app.get("/api/health", async (req, res) => {
 // so tests can import the app without opening a port.
 if (require.main === module) {
     app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
+        writeLog(`Server running on port ${PORT}`);
     });
 }
 
