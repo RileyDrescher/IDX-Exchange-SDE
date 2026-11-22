@@ -33,7 +33,7 @@ function handleNext(event) {
             <>
                 <img
                     src={photos[currentIndex]}
-                    alt={`${alt || "Property"} - Photo ${currentIndex + 1}`}
+                    alt={`${alt || "Property"} (${currentIndex + 1} of ${photos.length})`}
                     className="property-image"
                 />
 

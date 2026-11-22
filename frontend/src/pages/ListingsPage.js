@@ -65,7 +65,7 @@ function ListingsPage() {
                 latestRequest.current += 1;
             }
         };
-    }, [currentPage, itemsPerPage, activeFilters, sort]);
+    }, [offset, itemsPerPage, activeFilters, sort]);
     
     function handleSearch(filters) {
     const cleanFilters = Object.fromEntries(

@@ -52,7 +52,7 @@ function PropertyImageGallery({ photosData, alt }) {
                     {/* Main Image */}
                     <img
                         src={photos[currentIndex]}
-                        alt={`${alt || "Property"} - Photo ${currentIndex + 1}`}
+                        alt={`${alt || "Property"} (${currentIndex + 1} of ${photos.length})`}
                         className="gallery-main-image"
                         onClick={() => setIsLightboxOpen(true)}
                     />
@@ -103,7 +103,7 @@ function PropertyImageGallery({ photosData, alt }) {
 
                             <img
                                 src={photos[currentIndex]}
-                                alt={`${alt || "Property"} - Photo ${currentIndex + 1}`}
+                                alt={`${alt || "Property"} (${currentIndex + 1} of ${photos.length})`}
                                 className="lightbox-image"
                                 onClick={(event) => event.stopPropagation()}
                             />
