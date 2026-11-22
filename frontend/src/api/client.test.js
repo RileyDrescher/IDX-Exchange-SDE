@@ -10,7 +10,7 @@ test("fetchProperties returns property data", async () => {
             { id: 2, L_City: "Lathrop"}
         ]
     }
-    globalThis.fetch = jest.fn().mockResolvedValue({
+    global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         json: async () => mockdata
     });
@@ -18,14 +18,6 @@ test("fetchProperties returns property data", async () => {
     expect(global.fetch).toHaveBeenCalledWith(
         "/api/properties?city=Lathrop"
     )
-});
-
-test("fetchProperties throws an error when API fails", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-        ok: false,
-        status: 500
-    });
-
 });
 
 test("fetchProperties throws an error when API fails", async () => {
