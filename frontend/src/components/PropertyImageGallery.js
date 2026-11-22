@@ -1,5 +1,8 @@
 
 import { useState, useEffect } from "react";
+import { parsePhotos } from "../utils/photos";
+import PropTypes from "prop-types";
+import { photosDataType } from "../utils/propTypes";
 
 function PropertyImageGallery({ photosData, alt }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -52,7 +55,7 @@ function PropertyImageGallery({ photosData, alt }) {
                     {/* Main Image */}
                     <img
                         src={photos[currentIndex]}
-                        alt={`${alt || "Property"} - Photo ${currentIndex + 1}`}
+                        alt={`${alt || "Property"} (${currentIndex + 1} of ${photos.length})`}
                         className="gallery-main-image"
                         onClick={() => setIsLightboxOpen(true)}
                     />
@@ -103,7 +106,7 @@ function PropertyImageGallery({ photosData, alt }) {
 
                             <img
                                 src={photos[currentIndex]}
-                                alt={`${alt || "Property"} - Photo ${currentIndex + 1}`}
+                                alt={`${alt || "Property"} (${currentIndex + 1} of ${photos.length})`}
                                 className="lightbox-image"
                                 onClick={(event) => event.stopPropagation()}
                             />
@@ -130,26 +133,9 @@ function PropertyImageGallery({ photosData, alt }) {
     );
 }
 
+PropertyImageGallery.propTypes = {
+    photosData: photosDataType,
+    alt: PropTypes.string
+};
+
 export default PropertyImageGallery;
-
-function parsePhotos(photosData) {
-    try {
-        if (!photosData) {
-            return [];
-        }
-
-        const photos = typeof photosData === "string"
-            ? JSON.parse(photosData)
-            : photosData;
-
-        if (!Array.isArray(photos)) {
-            return [];
-        }
-
-        return photos.filter(
-            photo => typeof photo === "string" && photo.trim()
-        );
-    } catch (error) {
-        return [];
-    }
-}

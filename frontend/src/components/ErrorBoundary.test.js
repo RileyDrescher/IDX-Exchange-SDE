@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Routes, Route, Link } from "react-router-dom";
 import RouteErrorBoundary, { ErrorBoundary } from "./ErrorBoundary";

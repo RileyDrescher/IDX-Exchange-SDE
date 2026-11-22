@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
 // Catches errors thrown while rendering any child component and shows a
 // recovery screen instead of a blank page. (Error boundaries must be class
@@ -54,11 +55,19 @@ export class ErrorBoundary extends Component {
     }
 }
 
+ErrorBoundary.propTypes = {
+    children: PropTypes.node
+};
+
 // Resets the boundary whenever the route changes, so one broken page doesn't
 // stay stuck on the error screen after the user navigates away.
 function RouteErrorBoundary({ children }) {
     const location = useLocation();
     return <ErrorBoundary key={location.pathname}>{children}</ErrorBoundary>;
 }
+
+RouteErrorBoundary.propTypes = {
+    children: PropTypes.node
+};
 
 export default RouteErrorBoundary;

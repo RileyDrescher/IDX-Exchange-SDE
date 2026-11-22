@@ -21,11 +21,11 @@ function selectSql() {
 
 beforeEach(() => {
     pool.query.mockReset();
-    jest.spyOn(console, "log").mockImplementation(() => {});
+    jest.spyOn(process.stdout, "write").mockImplementation(() => true);
 });
 
 afterEach(() => {
-    console.log.mockRestore();
+    process.stdout.write.mockRestore();
 });
 
 describe("buildOrderBy", () => {

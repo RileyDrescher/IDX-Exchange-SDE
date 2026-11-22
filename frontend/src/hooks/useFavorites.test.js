@@ -87,9 +87,9 @@ test("ignores non-array or malformed stored data", () => {
 });
 
 test("separate components stay in sync", () => {
-    const first = renderHook(() => useFavorites());
-    const second = renderHook(() => useFavorites());
+    const { result: first } = renderHook(() => useFavorites());
+    const { result: second } = renderHook(() => useFavorites());
 
-    act(() => first.result.current.addFavorite(home(9)));
-    expect(second.result.current.isFavorite(9)).toBe(true);
+    act(() => first.current.addFavorite(home(9)));
+    expect(second.current.isFavorite(9)).toBe(true);
 });

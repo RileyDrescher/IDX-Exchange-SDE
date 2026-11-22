@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { parsePhotos } from "../utils/photos";
+import PropTypes from "prop-types";
+import { photosDataType } from "../utils/propTypes";
 
 function PropertyImageCarousel({ photosData, alt }) {
     const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,7 +36,7 @@ function handleNext(event) {
             <>
                 <img
                     src={photos[currentIndex]}
-                    alt={`${alt || "Property"} - Photo ${currentIndex + 1}`}
+                    alt={`${alt || "Property"} (${currentIndex + 1} of ${photos.length})`}
                     className="property-image"
                 />
 
@@ -66,26 +69,9 @@ function handleNext(event) {
 );
 }
 
+PropertyImageCarousel.propTypes = {
+    photosData: photosDataType,
+    alt: PropTypes.string
+};
+
 export default PropertyImageCarousel;
-
-function parsePhotos(photosData) {
-    try {
-        if (!photosData) {
-            return [];
-        }
-
-        const photos = typeof photosData === "string"
-            ? JSON.parse(photosData)
-            : photosData;
-
-        if (!Array.isArray(photos)) {
-            return [];
-        }
-
-        return photos.filter(
-            photo => typeof photo === "string" && photo.trim()
-        );
-    } catch (error) {
-        return [];
-    }
-}

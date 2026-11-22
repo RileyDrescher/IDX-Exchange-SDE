@@ -1,20 +1,8 @@
 import { Link } from "react-router-dom";
 import PropertyImageCarousel from "./PropertyImageCarousel";
 import FavoriteButton from "./FavoriteButton";
-
-function formatPrice(value) {
-    const price = Number(value);
-    return value !== null && value !== undefined && Number.isFinite(price)
-        ? `$${price.toLocaleString()}`
-        : "Price on request";
-}
-
-function formatNumber(value) {
-    const number = Number(value);
-    return value !== null && value !== undefined && Number.isFinite(number)
-        ? number.toLocaleString()
-        : "—";
-}
+import { formatPrice, formatNumber } from "../utils/format";
+import { propertyShape } from "../utils/propTypes";
 
 function PropertyCard({ property }) {
     return (
@@ -45,5 +33,9 @@ function PropertyCard({ property }) {
         </article>
     );
 }
+
+PropertyCard.propTypes = {
+    property: propertyShape.isRequired
+};
 
 export default PropertyCard;
